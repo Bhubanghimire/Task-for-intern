@@ -1,10 +1,14 @@
+from datetime import datetime
+from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.signals import user_logged_in
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.generics import  RetrieveUpdateAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
 from rest_framework.views import APIView
 from rest_framework_jwt.utils import jwt_payload_handler
 
@@ -102,7 +106,7 @@ class TaskIdAPIView(APIView):
 
         task_id = request.data.get("task_id",None)
         if not task_id:
-            res={'error':"You dont provide task id."}
+            res={'error':"You dont provide id."}
             return Response(res)
 
         task=Task.objects.filter(id=task_id)
