@@ -1,13 +1,8 @@
-import json
-from django import http
-from django.http import request, response
 from django.test import client
 from rest_framework import status
 from rest_framework.test import APITestCase
-from .models import User,Task
+from .models import User
 from django.urls import reverse
-from .serializers import TaskSerializer
-from django.test import TestCase
 from rest_framework.test import APIClient
 
 # # Create your tests here.
