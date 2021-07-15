@@ -20,7 +20,6 @@ import jwt
 
 
 class CreateUserAPIView(APIView):
-    # Allow any user (authenticated or not) to access this url
     permission_classes = (AllowAny,)
 
     def post(self, request):
@@ -59,8 +58,10 @@ def login(request):
     try:
         email = request.data['email']
         password = request.data['password']
+        
 
         user = User.objects.filter(email=email, password=password)
+        print(user)
         if user:
             user = User.objects.get(email=email, password=password)
             try:
@@ -85,65 +86,95 @@ def login(request):
         return Response(res)
 
 
+
 class TaskAPIView(generics.ListAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
 
+   
 
 
 class TaskIdAPIView(APIView):
     serializer_class = TaskSerializer
 
     def post(self, request):
-        task_id = request.data.get("task_id")
+
+        user = request.user.id
+        if not user:
+            res={'error':"Current user is not authorized.Please provide authorization key."}
+            return Response(res)
+
+        task_id = request.data.get("task_id",None)
+        if not task_id:
+            res={'error':"You dont provide task id."}
+            return Response(res)
+
         task=Task.objects.filter(id=task_id)
         serializers = TaskSerializer(task,many=True)
         return Response(serializers.data)
-
 
 
 class TaskUserAPIView(APIView):
     serializer_class = TaskSerializer
 
     def get(self, request):
-        user = request.user
+        user = request.user.id
+        if not user:
+            res={'error':"Current user is not authorized.Please provide authorization key."}
+            return Response(res)
+
         task=Task.objects.filter(assigned=user)
         serializers = TaskSerializer(task,many=True)
         return Response(serializers.data)
-
 
 
 class TaskStatusAPIView(APIView):
     serializer_class = TaskSerializer
 
     def post(self, request):
-        task_status = request.data.get("task_status")
+
+        user = request.user.id
+        if not user:
+            res={'error':"Current user is not authorized.Please provide authorization key."}
+            return Response(res)
+
+        task_status = request.data.get("task_status",None)
+
+        if not task_status:
+            res={'error':"Please provide task status.Your choices:incomplete,complete"}
+            return Response(res)
+
         task=Task.objects.filter(status=task_status)
         serializers = TaskSerializer(task,many=True)
         return Response(serializers.data)
-
 
 
 class TaskCreateAPIView(APIView):
     serializer_class = TaskSerializer
 
     def post(self,request):
+        user = request.user.id
+        if not user:
+            res={'error':"Current user is not authorized.Please provide authorization key."}
+            return Response(res)
+
         title = request.data.get('title',None)
         description = request.data.get('description',None)
-        assigned = request.data.get('assigned',None)
+        assigned = request.data.get('assigned',0)
 
         if (title and description and assigned):
             user = User.objects.filter(id=assigned)
             if user:
-                user = User.objects.filter(id=assigned)
+                user = User.objects.get(id=assigned)
                 task = Task.objects.create(title=title,description=description,assigned=user)
                 task.save()
                 res = {'status': 'Successfully created and assigned the task'}
             else:
                 res = {'error': 'User does not exists.'}
         
-        elif (title and description ):
+        elif (title and description):
             user = request.user
+            print(user)
             assigned = User.objects.get(email=user)
             task = Task.objects.create(title=title,description=description,assigned=assigned)
             task.save()

@@ -6,15 +6,14 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 urlpatterns = [
-    path('register/', CreateUserAPIView.as_view()),
-    path('update/', UserRetrieveUpdateAPIView.as_view()),
-    path('login/', login),
+    path('register/', CreateUserAPIView.as_view(),name="register"),
+    path('login/', login,name="login"),
 
-    path('alltask/',csrf_exempt(TaskAPIView.as_view())),
-    path('taskid/',TaskIdAPIView.as_view()),
-    path('tasktouser/',TaskUserAPIView.as_view()),
-    path('taskstatus/',TaskStatusAPIView.as_view()),
-    path('newtask/',TaskCreateAPIView.as_view())
+    path('alltask/',csrf_exempt(TaskAPIView.as_view()),name="alltask"),
+    path('taskid/',TaskIdAPIView.as_view(),name="task_by_id"),
+    path('tasktouser/',TaskUserAPIView.as_view(),name='task_to_user'),
+    path('taskstatus/',TaskStatusAPIView.as_view(),name='task_by_status'),
+    path('newtask/',TaskCreateAPIView.as_view(),name="new_task"),
 
 
 ]
