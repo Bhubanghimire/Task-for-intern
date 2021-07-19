@@ -15,5 +15,4 @@ urlpatterns = [
     path('taskstatus/',TaskStatusAPIView.as_view(),name='task_by_status'),
     path('newtask/',TaskCreateAPIView.as_view(),name="new_task"),
 
-
 ]
